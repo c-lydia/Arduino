@@ -1,7 +1,9 @@
 int pin_A = 2; 
 int pin_B = 3; 
 int LastPinA; 
+int LastPinB; 
 int CurrentPinA; 
+int CurrentPinB; 
 int encoder_counter;
 bool clockwise = 1; 
 bool counter_clockwise = 0; 
@@ -13,12 +15,13 @@ void setup() {
   pinMode(pin_A, INPUT); 
   pinMode(pin_B, INPUT); 
   LastPinA = digitalRead(pin_A);
-  attachInterrupt(digitalPinToInterrupt(pin_A), read_pulse, RISING); 
-  attachInterrupt(digitalPinToInterrupt(pin_B), read_pulse, FALLING); 
+  attachInterrupt(digitalPinToInterrupt(pin_A), read_pulse, CHANGE); 
+  attachInterrupt(digitalPinToInterrupt(pin_B), read_pulse, CHANGE); 
 }
 
 void loop() {
   CurrentPinA = digitalRead(pin_A); 
+  CurrentPinB = digitalRead(pin_B); 
 
   if (prev_counter != encoder_counter) {
     if (direction == clockwise) {
@@ -33,14 +36,24 @@ void loop() {
   }
 
   LastPinA = CurrentPinA; 
+  LastPinB = CurrentPinB; 
 }
 
 
 void read_pulse() {
-  bool A_state = digitalRead(pin_A);
-  bool B_state = digitalRead(pin_B);
+ if (CurrentPinA == LOW && LastPinA == HIGH) {
+  if (CurrentPinB == LOW) {
+    encoder_counter++; 
+    direction = clockwise; 
+  } 
+  else {
+    encoder_counter--; 
+    direction = counter_clockwise; 
+  }
+ }
 
-  if (A_state ^ B_state) {
+ if (CuurentPinB == HIGH && LastPinB == LOW) {
+  if (CurrentPinA == HIGH) {
     encoder_counter--; 
     direction = counter_clockwise; 
   }
@@ -48,4 +61,6 @@ void read_pulse() {
     encoder_counter++; 
     direction = clockwise; 
   }
+ }
 }
+
