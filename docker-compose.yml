@@ -1,0 +1,21 @@
+services:
+  platformio:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      # Mounts your project code into the container
+      - .:/workspace:cached
+      # Persists PlatformIO libraries and toolchains so they don't redownload
+      - pio_cache:/root/.platformio
+      # Maps hardware devices
+      - /dev:/dev
+    # Essential for accessing serial ports/Arduino hardware
+    privileged: true
+    network_mode: host
+    working_dir: /workspace
+    # Keeps the container running for VS Code to attach to
+    command: sleep infinity
+
+volumes:
+  pio_cache:
